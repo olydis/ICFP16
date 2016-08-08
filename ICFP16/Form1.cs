@@ -68,6 +68,9 @@ namespace ICFP16
             prob.Render();
 
             var g = prob.CreateGraph();
+            var area = g.Faces.Sum(x => x.Value.Item1.ToFloat());
+            if (area < 1f / Constants.SkipIfSmallerThan)
+                return;
             var sols = g.FullSearch();
             
             var sw = Stopwatch.StartNew();
@@ -153,26 +156,38 @@ namespace ICFP16
                 return state.Problems.Any(p => p.hash == hash && p.Description != null);
             };
 
-            var i = 0;
-            foreach (var p in state.Problems)
-            {
-                i++;
-                if (ensuredBefore(p.hash))
-                    continue;
-                p.Ensure();
-                Save();
-                Console.WriteLine(i);
-            }
+            //new Thread((ThreadStart)(() =>
+            //{
+            //    var i = 0;
+            //    foreach (var p in state.Problems)
+            //    {
+            //        i++;
+            //        if (ensuredBefore(p.hash))
+            //            continue;
+            //        p.Ensure();
+            //        Save();
+            //        Console.WriteLine(i);
+            //    }
+            //})).Start();
 
-            Constants.MaxFacetsCount = 1000;
+            foreach (var p in state.Problems
+                .Where(x => x.Owner != uid)
+                .Where(x => !x.SolvedFullScore())
+                .Where(x => succeededBefore(x.hash)))
+                HandleProblem(p);
+            Console.WriteLine("DONE WITH LOW HANGING FRUIT");
+
+            Constants.MaxFacetsCount = 200;
             //Constants.TryWithoutEdges = true;
             var ps = state.Problems.AsEnumerable()
                 .Where(x => x.Owner != uid)
                 .Where(x => !x.SolvedFullScore())
                 .Where(x => x.BestSolutionScore == 1)
                 .Where(x => !failedBefore(x.hash) || succeededBefore(x.hash))
-                //.OrderBy(x => x.SolutionSize)
+                .OrderBy(x => x.SolutionSize)
                 //.OrderBy(x => x.ProblemSize)
+                //.Where(x => x.Description != null)
+                //.OrderBy(x => x.Description.Split('\n').Length)
                 .AsParallel();
 
             //Parallel.ForEach(ps, p =>
@@ -265,9 +280,13 @@ namespace ICFP16
             if (!File.Exists(currFN))
                 File.Copy("state.xml", currFN);
 
-            this.richTextBox1.Text = state.ToString();
-            this.Text = state.Problems.Count(x => x.SolvedFullScore()) + "/" +
-                state.Problems.Count;
+            try
+            {
+                this.richTextBox1.Text = state.ToString();
+                this.Text = state.Problems.Count(x => x.SolvedFullScore()) + "/" +
+                    state.Problems.Count;
+            }
+            catch { }
         }
     }
 

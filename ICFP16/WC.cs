@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,6 +30,7 @@ namespace ICFP16
         int throttle = 1300;
         DateTime last;
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         private void Throttle()
         {
             var now = DateTime.Now;

@@ -29,8 +29,8 @@ namespace ICFP16
     }
     public class Constants
     {
-        public static readonly int MaxTimePerWorldMS = 10 * 1000 * 1;
-        public static readonly int MaxTimePerGraphMS = 20 * 1000 * 1;
+        public static readonly int MaxTimePerWorldMS = 1 * 1000 * 1;
+        public static readonly int MaxTimePerGraphMS = 3 * 1000 * 1;
         public static readonly int MaxReOptimizationTimeMS = 60 * 1000 * 1;
         public static readonly bool ReOptimization = false;
 
@@ -39,5 +39,6 @@ namespace ICFP16
         public static int MaxFacetsCount = 200;
         public static int MaxFacetsPerTypeCount = 16;
         public static bool TryWithoutEdges = false;
+        public static readonly int SkipIfSmallerThan = 50;
     }
 }

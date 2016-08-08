@@ -213,7 +213,10 @@ namespace ICFP16
                 if (x.Solved)
                 {
                     if (x.Valid)
+                    {
+                        x.OptimizeSolution();
                         yield return x;
+                    }
                 }
                 else
                     foreach (var xx in x.Extend().OrderByDescending(y => y.area))
@@ -443,11 +446,22 @@ namespace ICFP16
                     face1.Add(face1[0]);
                     face1.RemoveAt(0);
                 }
-                face2.RemoveAt(0);
-                face2.RemoveAt(face2.Count - 1);
-                face1.AddRange(face2);
-                
-                facets.RemoveAt(j);
+                if (face2[1].Equals(b))
+                {
+                    face2.RemoveAt(0);
+                    face2.RemoveAt(0);
+                    face1.InsertRange(1, face2);
+
+                    facets.RemoveAt(j);
+                }
+                else
+                {
+                    face2.RemoveAt(0);
+                    face2.RemoveAt(face2.Count - 1);
+                    face1.AddRange(face2);
+
+                    facets.RemoveAt(j);
+                }
                 goto redo;
             }
         }
